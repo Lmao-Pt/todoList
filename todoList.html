@@ -1,0 +1,91 @@
+<!DOCTYPE HTML>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Title</title>
+        <meta name="keywords" content="关键词">
+        <meta name="description" content="描述">
+        <meta name="author" content="Pt">
+        <link rel="stylesheet" href="todoList.css">
+        <style>
+            body,dl,dd,p,h1,h2,h3,h4,h5,h6{margin:0;}
+            ol,ul,li{margin:0;padding:0;list-style:none;}
+            img{border:none;}
+        
+        </style>
+    </head>
+    <body>
+        <div id="app" class="main">
+            <h2>小目标列表</h2>
+            <div class="list">
+                <h3>添加小目标</h3>
+                <input type="text" class="text-keyword" v-model="msg" placeholder="输入小目标后，按回车确认" @keyup.13="addTarget"/>
+                <p>共有{{tarList.length}}个目标</p>
+                <p>
+                    <input type="radio" name="chooseType" @click="chooseType(1)" checked="true"/><label>所有目标</label>
+                    <input type="radio" name="chooseType" @click="chooseType(2)" /><label>已完成目标</label>
+                    <input type="radio" name="chooseType" @click="chooseType(3)"/><label>未完成目标</label>
+                </p>
+            </div>
+            <ul>
+                <li class="li1" v-for="(item,index) in newList">
+                    <div @dbclick="edit()">
+                        <span class="type-span" @click="changeType(index)" :class="{'isDone': item.isFinished}" ></span>
+                        <span>{{item.target}}</span>
+                        <span class="close" @click="item.isFinished=!item.isFinished">X</span>
+                        <!--todo:使得小目标可以被编辑-->
+                    </div>
+                </li>
+            </ul>
+        </div>
+        <script src="vue.js"></script>
+        <script>
+            new Vue({
+                el: '#app',
+                data: {
+                    msg: "",
+                    tarList:[{target: 'css3',isFinished: true},{target: "html5",isFinished: false}],
+                    newList:[]
+                },
+                methods: {
+                    //添加小目标
+                    addTarget(){
+                        this.tarList.push({target: this.msg ,isFinished: false});
+                        this.msg= "";
+                    },
+                    //选择展示的list
+                    chooseType(num){
+                        this.curType= num;
+                        switch (num){
+                            case 1:this.newList= this.tarList;break;
+                            case 2:this.newList= this.tarList.filter(function (item) {
+                                return item.isFinished
+                            });break;
+                            case 3:this.newList= this.tarList.filter(function (item) {
+                                return !item.isFinished
+                            });break;
+                        }
+                    },
+                    deleteList(ix){
+                        console.log(ix);
+                        //一个小坑 关于splice（）的返回值
+                        this.tarList.length>1 ? this.tarList.splice(ix,2):this.tarList= [];
+                        this.newList= this.tarList;
+                    },
+                    changeType(i){
+                        this.newList[i].isFinished = !this.newList[i].isFinished;//更新数据
+                        this.chooseType(this.curType);
+                    },
+                    edit(){}
+
+                },
+                mounted() {
+                    this.newList= this.tarList;
+                },
+                computed: {
+
+                },
+            });
+        </script>
+    </body>
+</html>
